@@ -24,3 +24,12 @@ dist-ssr
 *.sw?
 .github/as.md
 .env
+.env.local
+.env.development
+.env.production
+
+# Database
+*.sqlite
+*.db
+database.sqlite
+server/database.sqlite
