@@ -2,6 +2,7 @@
   "watch": ["server/src"],
   "ext": "ts,js,json",
   "ignore": ["server/database.sqlite", "node_modules/"],
+  "exec": "tsx server/src/index.ts",
   "env": {
     "NODE_ENV": "development"
   }
