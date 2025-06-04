@@ -1,0 +1,8 @@
+{
+  "watch": ["server/src"],
+  "ext": "ts,js,json",
+  "ignore": ["server/database.sqlite", "node_modules/"],
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
