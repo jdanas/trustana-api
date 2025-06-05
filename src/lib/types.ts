@@ -11,7 +11,7 @@ export interface Category {
 export interface Attribute {
   id: number;
   name: string;
-  type: 'text' | 'number' | 'boolean' | 'select' | 'multi-select';
+  type: "text" | "number" | "boolean" | "select" | "multi-select";
   description?: string;
   options?: string[];
   createdAt: Date;
@@ -29,7 +29,7 @@ export interface CategoryTreeNode {
 }
 
 export interface AttributeWithDetails extends Attribute {
-  linkType?: 'direct' | 'inherited' | 'global';
+  linkType?: "direct" | "inherited" | "global";
   categoryPath?: string;
   productCount: number;
 }
@@ -51,16 +51,36 @@ export interface CategoryTreeResponse {
 
 export interface AttributesQueryParams {
   categoryNodes?: string[];
-  linkType?: ('direct' | 'inherited' | 'global')[];
+  linkType?: ("direct" | "inherited" | "global")[];
   notApplicable?: boolean;
   keyword?: string;
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface CategoryTreeQueryParams {
   includeAttributeCount?: boolean;
   includeProductCount?: boolean;
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  description?: string;
+  categoryId: number;
+  categoryName: string;
+  categoryPath: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ProductsQueryParams {
+  categoryId?: string | number[];
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  keyword?: string;
 }

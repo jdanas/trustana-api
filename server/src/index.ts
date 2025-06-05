@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { initializeDatabase, seedDatabase } from "./database/postgres";
 import attributesRouter from "./routes/attributes";
 import categoriesRouter from "./routes/categories";
+import productsRouter from "./routes/products";
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/attributes", attributesRouter);
 app.use("/api/categories", categoriesRouter);
+app.use("/api/products", productsRouter);
 
 // Root route
 app.get("/", (req, res) => {

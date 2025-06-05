@@ -2,6 +2,7 @@ import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CategoryTree } from "./components/CategoryTree";
 import { AttributesList } from "./components/AttributesList";
+import { ProductsList } from "./components/ProductsList";
 import "./App.css";
 
 const queryClient = new QueryClient({
@@ -66,7 +67,7 @@ function App() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div>
               <CategoryTree
                 onCategorySelect={handleCategorySelect}
@@ -75,6 +76,9 @@ function App() {
             </div>
             <div>
               <AttributesList selectedCategories={selectedCategories} />
+            </div>
+            <div>
+              <ProductsList selectedCategories={selectedCategories} />
             </div>
           </div>
 
