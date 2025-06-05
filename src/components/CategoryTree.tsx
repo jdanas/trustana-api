@@ -13,7 +13,7 @@ interface CategoryTreeProps {
 
 export function CategoryTree({ onCategorySelect, selectedCategories = [] }: CategoryTreeProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set([1, 2])); // Expand root nodes by default
-  const [showCounts, setShowCounts] = useState(false);
+  const [showCounts, setShowCounts] = useState(true); // Show counts by default
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['categoryTree', showCounts],
@@ -91,7 +91,7 @@ export function CategoryTree({ onCategorySelect, selectedCategories = [] }: Cate
                   <span className="mr-2">A: {node.attributeCount}</span>
                 )}
                 {node.productCount !== undefined && (
-                  <span>P: {node.productCount}</span>
+                  <span className="font-medium text-blue-600 dark:text-blue-400">P: {node.productCount}</span>
                 )}
               </div>
             )}

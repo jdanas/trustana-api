@@ -57,7 +57,12 @@ export const getCategoryTree = async (
 
     // Add product count if requested
     if (includeProductCount === "true") {
-      query += `, COUNT(DISTINCT p.id) as product_count`;
+      query += `, 
+        (SELECT COUNT(DISTINCT p.id) 
+         FROM products p 
+         JOIN categories child 
+         ON p.category_id = child.id 
+         WHERE child.path LIKE CONCAT(c.path, '%')) as product_count`;
     }
 
     query += ` FROM categories c`;
@@ -66,9 +71,6 @@ export const getCategoryTree = async (
     const joins: string[] = [];
     if (includeAttributeCount === "true") {
       joins.push("LEFT JOIN category_attributes ca ON c.id = ca.category_id");
-    }
-    if (includeProductCount === "true") {
-      joins.push("LEFT JOIN products p ON c.id = p.category_id");
     }
 
     if (joins.length > 0) {
