@@ -39,8 +39,8 @@ app.get("/", (req, res) => {
     endpoints: {
       health: "/api/health",
       attributes: "/api/attributes",
-      categories: "/api/categories/tree"
-    }
+      categories: "/api/categories/tree",
+    },
   });
 });
 
@@ -54,29 +54,29 @@ app.get("/api", (req, res) => {
       health: {
         method: "GET",
         path: "/api/health",
-        description: "Health check endpoint"
+        description: "Health check endpoint",
       },
       attributes: {
-        method: "GET", 
+        method: "GET",
         path: "/api/attributes",
         description: "Get attributes with optional filtering",
         queryParams: {
           page: "Page number (default: 1)",
           limit: "Items per page (default: 50)",
           categoryIds: "Comma-separated category IDs",
-          keyword: "Search keyword"
-        }
+          keyword: "Search keyword",
+        },
       },
       categories: {
         method: "GET",
-        path: "/api/categories/tree", 
+        path: "/api/categories/tree",
         description: "Get category tree structure",
         queryParams: {
           includeAttributeCount: "Include attribute counts (true/false)",
-          includeProductCount: "Include product counts (true/false)"
-        }
-      }
-    }
+          includeProductCount: "Include product counts (true/false)",
+        },
+      },
+    },
   });
 });
 
