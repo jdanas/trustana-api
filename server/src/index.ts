@@ -29,6 +29,57 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/attributes", attributesRouter);
 app.use("/api/categories", categoriesRouter);
 
+// Root route
+app.get("/", (req, res) => {
+  res.json({
+    name: "Trustana API",
+    version: "1.0.0",
+    status: "running",
+    documentation: "/api",
+    endpoints: {
+      health: "/api/health",
+      attributes: "/api/attributes",
+      categories: "/api/categories/tree"
+    }
+  });
+});
+
+// API documentation endpoint
+app.get("/api", (req, res) => {
+  res.json({
+    name: "Trustana API",
+    version: "1.0.0",
+    description: "API for managing product categories and attributes",
+    endpoints: {
+      health: {
+        method: "GET",
+        path: "/api/health",
+        description: "Health check endpoint"
+      },
+      attributes: {
+        method: "GET", 
+        path: "/api/attributes",
+        description: "Get attributes with optional filtering",
+        queryParams: {
+          page: "Page number (default: 1)",
+          limit: "Items per page (default: 50)",
+          categoryIds: "Comma-separated category IDs",
+          keyword: "Search keyword"
+        }
+      },
+      categories: {
+        method: "GET",
+        path: "/api/categories/tree", 
+        description: "Get category tree structure",
+        queryParams: {
+          includeAttributeCount: "Include attribute counts (true/false)",
+          includeProductCount: "Include product counts (true/false)"
+        }
+      }
+    }
+  });
+});
+
 // Health check endpoint
 app.get("/api/health", (req, res) => {
   res.json({
@@ -38,14 +89,22 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Error handling middlewar
-app.use((err: Error, req: express.Request, res: express.Response) => {
-  console.error("Error:", err);
-  res.status(500).json({
-    error: "Internal server error",
-    message: process.env.NODE_ENV === "development" ? err.message : undefined,
-  });
-});
+// Error handling middleware
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _next: express.NextFunction
+  ) => {
+    console.error("Error:", err);
+    res.status(500).json({
+      error: "Internal server error",
+      message: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+);
 
 // 404 handler
 app.use((req, res) => {
