@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { CategoryTree } from './components/CategoryTree';
-import { AttributesList } from './components/AttributesList';
-import './App.css';
+import { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CategoryTree } from "./components/CategoryTree";
+import { AttributesList } from "./components/AttributesList";
+import "./App.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,9 +17,9 @@ function App() {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   const handleCategorySelect = (categoryId: number) => {
-    setSelectedCategories(prev => {
+    setSelectedCategories((prev) => {
       if (prev.includes(categoryId)) {
-        return prev.filter(id => id !== categoryId);
+        return prev.filter((id) => id !== categoryId);
       } else {
         return [...prev, categoryId];
       }
@@ -39,7 +39,8 @@ function App() {
               Trustana Product Management
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Manage product categories and attributes with advanced filtering and pagination
+              Manage product categories and attributes with advanced filtering
+              and pagination
             </p>
           </header>
 
@@ -48,7 +49,8 @@ function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium text-blue-900 dark:text-blue-100">
-                    {selectedCategories.length} categor{selectedCategories.length === 1 ? 'y' : 'ies'} selected
+                    {selectedCategories.length} categor
+                    {selectedCategories.length === 1 ? "y" : "ies"} selected
                   </h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300">
                     Attributes are filtered based on your selection
@@ -78,7 +80,9 @@ function App() {
 
           <footer className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>Trustana MVP - Product Categories & Attributes Management</p>
-            <p className="mt-1">Built with React, TypeScript, Express, and SQLite</p>
+            <p className="mt-1">
+              Built with React, TypeScript, Postgres, all Dockerize
+            </p>
           </footer>
         </div>
       </div>
