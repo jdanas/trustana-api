@@ -68,7 +68,6 @@ export interface CategoryTreeQueryParams {
 export interface Product {
   id: number;
   name: string;
-  description?: string;
   categoryId: number;
   categoryName: string;
   categoryPath: string;

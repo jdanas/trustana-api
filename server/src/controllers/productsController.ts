@@ -31,17 +31,8 @@ export const getProducts = async (
     const db = getDb();
     const params: unknown[] = [];
 
-    // Build the query
-    let query = `
-      SELECT 
-        p.id,
-        p.name,
-        p.description,
-        p.category_id,
-        c.name as category_name,
-        c.path as category_path,
-        p.created_at,
-        p.updated_at
+    // Build the base query
+    let baseQuery = `
       FROM products p
       JOIN categories c ON p.category_id = c.id
       WHERE 1=1
@@ -50,46 +41,43 @@ export const getProducts = async (
     // Add category filtering
     if (categoryId) {
       const categoryIds = categoryId.split(",");
-
-      // Find all subcategories of the selected categories
-      query += ` AND (
-        EXISTS (
-          SELECT 1 FROM categories sub
-          WHERE p.category_id = sub.id
-          AND (`;
-
-      const conditions: string[] = [];
-
-      for (let i = 0; i < categoryIds.length; i++) {
-        params.push(`${categoryIds[i]}`);
-        conditions.push(
-          `sub.path LIKE (SELECT CONCAT(path, '%') FROM categories WHERE id = $${params.length})`
-        );
-      }
-
-      query += conditions.join(" OR ");
-      query += `))`;
+      const placeholders = categoryIds.map((_, index) => `$${params.length + index + 1}`).join(",");
+      params.push(...categoryIds);
+      baseQuery += ` AND p.category_id IN (${placeholders})`;
     }
 
     // Add keyword search
     if (keyword) {
       params.push(`%${keyword}%`);
-      query += ` AND (p.name ILIKE $${params.length} OR p.description ILIKE $${params.length})`;
+      baseQuery += ` AND p.name ILIKE $${params.length}`;
     }
 
     // Count total products matching the criteria
-    const countQuery = `SELECT COUNT(*) FROM (${query}) as filtered_products`;
+    const countQuery = `SELECT COUNT(*) ${baseQuery}`;
     const countResult = await db.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count, 10);
 
+    // Build the main query with selection
+    const selectQuery = `
+      SELECT 
+        p.id,
+        p.name,
+        p.category_id,
+        c.name as category_name,
+        c.path as category_path,
+        p.created_at,
+        p.updated_at
+      ${baseQuery}
+    `;
+
     // Add sorting and pagination
-    query += ` ORDER BY ${sortBy === "category" ? "c.name" : `p.${sortBy}`} ${
-      sortOrder === "desc" ? "DESC" : "ASC"
-    }`;
-    query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    const sortField = sortBy === "category" ? "c.name" : `p.${sortBy}`;
+    const sortDirection = sortOrder === "desc" ? "DESC" : "ASC";
+    const finalQuery = `${selectQuery} ORDER BY ${sortField} ${sortDirection} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    
     params.push(limitNumber, offset);
 
-    const result = await db.query(query, params);
+    const result = await db.query(finalQuery, params);
 
     res.json({
       data: result.rows,

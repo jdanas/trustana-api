@@ -173,11 +173,6 @@ export function ProductsList({ selectedCategories = [] }: ProductsListProps) {
                     >
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="font-medium">{product.name}</div>
-                        {product.description && (
-                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[300px]">
-                            {product.description}
-                          </div>
-                        )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {product.categoryName}
