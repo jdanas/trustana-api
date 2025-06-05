@@ -4,12 +4,21 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "dev": "npm run db:start && concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "dev:full": "npm run db:up && concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "client:dev": "vite",
     "server:dev": "nodemon --exec tsx server/src/index.ts",
+    "db:start": "docker-compose up -d postgres",
+    "db:up": "docker-compose up -d",
+    "db:stop": "docker-compose stop",
+    "db:down": "docker-compose down",
+    "db:reset": "docker-compose down -v && docker-compose up -d postgres",
+    "db:logs": "docker-compose logs -f postgres",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npm run dev",
+    "stop": "npm run db:stop"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.80.2",
