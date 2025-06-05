@@ -1,22 +1,22 @@
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
+import { Pool } from "pg";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'trustana_db',
-  password: process.env.DB_PASSWORD || 'password',
-  port: parseInt(process.env.DB_PORT || '5432'),
+  user: process.env.DB_USER || "postgres",
+  host: process.env.DB_HOST || "localhost",
+  database: process.env.DB_NAME || "trustana_db",
+  password: process.env.DB_PASSWORD || "password",
+  port: parseInt(process.env.DB_PORT || "5432"),
 });
 
 export const getDb = () => pool;
 
 export const initializeDatabase = async (): Promise<void> => {
   try {
-    console.log('Initializing PostgreSQL database...');
-    
+    console.log("Initializing PostgreSQL database...");
+
     // Create categories table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS categories (
@@ -78,43 +78,57 @@ export const initializeDatabase = async (): Promise<void> => {
     `);
 
     // Create indexes for better performance
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_category_attributes_category_id ON category_attributes(category_id)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_category_attributes_attribute_id ON category_attributes(attribute_id)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_product_attributes_product_id ON product_attributes(product_id)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_product_attributes_attribute_id ON product_attributes(attribute_id)');
+    await pool.query(
+      "CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id)"
+    );
+    await pool.query(
+      "CREATE INDEX IF NOT EXISTS idx_category_attributes_category_id ON category_attributes(category_id)"
+    );
+    await pool.query(
+      "CREATE INDEX IF NOT EXISTS idx_category_attributes_attribute_id ON category_attributes(attribute_id)"
+    );
+    await pool.query(
+      "CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id)"
+    );
+    await pool.query(
+      "CREATE INDEX IF NOT EXISTS idx_product_attributes_product_id ON product_attributes(product_id)"
+    );
+    await pool.query(
+      "CREATE INDEX IF NOT EXISTS idx_product_attributes_attribute_id ON product_attributes(attribute_id)"
+    );
 
-    console.log('Database tables created successfully');
+    console.log("Database tables created successfully");
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error("Error initializing database:", error);
     throw error;
   }
 };
 
 export const seedDatabase = async (): Promise<void> => {
   try {
-    console.log('Seeding database...');
-    
+    console.log("Seeding database...");
+
     // Check if data already exists
-    const existingCategories = await pool.query('SELECT COUNT(*) FROM categories');
+    const existingCategories = await pool.query(
+      "SELECT COUNT(*) FROM categories"
+    );
     if (parseInt(existingCategories.rows[0].count) > 0) {
-      console.log('Database already seeded, skipping...');
+      console.log("Database already seeded, skipping...");
       return;
     }
 
     // Seed categories (hierarchical structure)
     const categories = [
-      { name: 'Electronics', path: 'electronics', parent_id: null },
-      { name: 'Food & Beverages', path: 'food-beverages', parent_id: null },
-      { name: 'Clothing', path: 'clothing', parent_id: null },
+      { name: "Electronics", path: "electronics", parent_id: null },
+      { name: "Food & Beverages", path: "food-beverages", parent_id: null },
+      { name: "Clothing", path: "clothing", parent_id: null },
     ];
 
     const categoryIds: Record<string, number> = {};
-    
+
     for (const category of categories) {
       const result = await pool.query(
-        'INSERT INTO categories (name, path, parent_id) VALUES ($1, $2, $3) RETURNING id',
+        "INSERT INTO categories (name, path, parent_id) VALUES ($1, $2, $3) RETURNING id",
         [category.name, category.path, category.parent_id]
       );
       categoryIds[category.name] = result.rows[0].id;
@@ -122,17 +136,41 @@ export const seedDatabase = async (): Promise<void> => {
 
     // Seed subcategories
     const subcategories = [
-      { name: 'Smartphones', path: 'electronics/smartphones', parent_id: categoryIds['Electronics'] },
-      { name: 'Laptops', path: 'electronics/laptops', parent_id: categoryIds['Electronics'] },
-      { name: 'Beverages', path: 'food-beverages/beverages', parent_id: categoryIds['Food & Beverages'] },
-      { name: 'Snacks', path: 'food-beverages/snacks', parent_id: categoryIds['Food & Beverages'] },
-      { name: 'T-Shirts', path: 'clothing/t-shirts', parent_id: categoryIds['Clothing'] },
-      { name: 'Jeans', path: 'clothing/jeans', parent_id: categoryIds['Clothing'] },
+      {
+        name: "Smartphones",
+        path: "electronics/smartphones",
+        parent_id: categoryIds["Electronics"],
+      },
+      {
+        name: "Laptops",
+        path: "electronics/laptops",
+        parent_id: categoryIds["Electronics"],
+      },
+      {
+        name: "Beverages",
+        path: "food-beverages/beverages",
+        parent_id: categoryIds["Food & Beverages"],
+      },
+      {
+        name: "Snacks",
+        path: "food-beverages/snacks",
+        parent_id: categoryIds["Food & Beverages"],
+      },
+      {
+        name: "T-Shirts",
+        path: "clothing/t-shirts",
+        parent_id: categoryIds["Clothing"],
+      },
+      {
+        name: "Jeans",
+        path: "clothing/jeans",
+        parent_id: categoryIds["Clothing"],
+      },
     ];
 
     for (const subcategory of subcategories) {
       const result = await pool.query(
-        'INSERT INTO categories (name, path, parent_id) VALUES ($1, $2, $3) RETURNING id',
+        "INSERT INTO categories (name, path, parent_id) VALUES ($1, $2, $3) RETURNING id",
         [subcategory.name, subcategory.path, subcategory.parent_id]
       );
       categoryIds[subcategory.name] = result.rows[0].id;
@@ -140,13 +178,21 @@ export const seedDatabase = async (): Promise<void> => {
 
     // Add more specific subcategories
     const specificCategories = [
-      { name: 'Flavoured Drinks', path: 'food-beverages/beverages/flavoured-drinks', parent_id: categoryIds['Beverages'] },
-      { name: 'Coffee', path: 'food-beverages/beverages/coffee', parent_id: categoryIds['Beverages'] },
+      {
+        name: "Flavoured Drinks",
+        path: "food-beverages/beverages/flavoured-drinks",
+        parent_id: categoryIds["Beverages"],
+      },
+      {
+        name: "Coffee",
+        path: "food-beverages/beverages/coffee",
+        parent_id: categoryIds["Beverages"],
+      },
     ];
 
     for (const specific of specificCategories) {
       const result = await pool.query(
-        'INSERT INTO categories (name, path, parent_id) VALUES ($1, $2, $3) RETURNING id',
+        "INSERT INTO categories (name, path, parent_id) VALUES ($1, $2, $3) RETURNING id",
         [specific.name, specific.path, specific.parent_id]
       );
       categoryIds[specific.name] = result.rows[0].id;
@@ -154,79 +200,115 @@ export const seedDatabase = async (): Promise<void> => {
 
     // Seed attributes
     const attributes = [
-      { name: 'Color', type: 'select', is_required: false, is_global: true },
-      { name: 'Brand', type: 'text', is_required: true, is_global: true },
-      { name: 'Price', type: 'number', is_required: true, is_global: true },
-      { name: 'Screen Size', type: 'number', is_required: false, is_global: false },
-      { name: 'Storage Capacity', type: 'select', is_required: false, is_global: false },
-      { name: 'Flavour', type: 'select', is_required: false, is_global: false },
-      { name: 'Caffeine Content', type: 'number', is_required: false, is_global: false },
-      { name: 'Size', type: 'select', is_required: false, is_global: false },
-      { name: 'Material', type: 'text', is_required: false, is_global: false },
-      { name: 'Weight', type: 'number', is_required: false, is_global: false },
+      { name: "Color", type: "select", is_required: false, is_global: true },
+      { name: "Brand", type: "text", is_required: true, is_global: true },
+      { name: "Price", type: "number", is_required: true, is_global: true },
+      {
+        name: "Screen Size",
+        type: "number",
+        is_required: false,
+        is_global: false,
+      },
+      {
+        name: "Storage Capacity",
+        type: "select",
+        is_required: false,
+        is_global: false,
+      },
+      { name: "Flavour", type: "select", is_required: false, is_global: false },
+      {
+        name: "Caffeine Content",
+        type: "number",
+        is_required: false,
+        is_global: false,
+      },
+      { name: "Size", type: "select", is_required: false, is_global: false },
+      { name: "Material", type: "text", is_required: false, is_global: false },
+      { name: "Weight", type: "number", is_required: false, is_global: false },
     ];
 
     const attributeIds: Record<string, number> = {};
-    
+
     for (const attribute of attributes) {
       const result = await pool.query(
-        'INSERT INTO attributes (name, type, is_required, is_global) VALUES ($1, $2, $3, $4) RETURNING id',
-        [attribute.name, attribute.type, attribute.is_required, attribute.is_global]
+        "INSERT INTO attributes (name, type, is_required, is_global) VALUES ($1, $2, $3, $4) RETURNING id",
+        [
+          attribute.name,
+          attribute.type,
+          attribute.is_required,
+          attribute.is_global,
+        ]
       );
       attributeIds[attribute.name] = result.rows[0].id;
     }
 
     // Seed category-attribute relationships (direct links)
     const categoryAttributeLinks = [
-      { category: 'Electronics', attribute: 'Screen Size', link_type: 'direct' },
-      { category: 'Electronics', attribute: 'Weight', link_type: 'direct' },
-      { category: 'Smartphones', attribute: 'Storage Capacity', link_type: 'direct' },
-      { category: 'Beverages', attribute: 'Flavour', link_type: 'direct' },
-      { category: 'Flavoured Drinks', attribute: 'Caffeine Content', link_type: 'direct' },
-      { category: 'Clothing', attribute: 'Size', link_type: 'direct' },
-      { category: 'Clothing', attribute: 'Material', link_type: 'direct' },
+      {
+        category: "Electronics",
+        attribute: "Screen Size",
+        link_type: "direct",
+      },
+      { category: "Electronics", attribute: "Weight", link_type: "direct" },
+      {
+        category: "Smartphones",
+        attribute: "Storage Capacity",
+        link_type: "direct",
+      },
+      { category: "Beverages", attribute: "Flavour", link_type: "direct" },
+      {
+        category: "Flavoured Drinks",
+        attribute: "Caffeine Content",
+        link_type: "direct",
+      },
+      { category: "Clothing", attribute: "Size", link_type: "direct" },
+      { category: "Clothing", attribute: "Material", link_type: "direct" },
     ];
 
     for (const link of categoryAttributeLinks) {
       await pool.query(
-        'INSERT INTO category_attributes (category_id, attribute_id, link_type) VALUES ($1, $2, $3)',
-        [categoryIds[link.category], attributeIds[link.attribute], link.link_type]
+        "INSERT INTO category_attributes (category_id, attribute_id, link_type) VALUES ($1, $2, $3)",
+        [
+          categoryIds[link.category],
+          attributeIds[link.attribute],
+          link.link_type,
+        ]
       );
     }
 
     // Seed some sample products
     const products = [
-      { name: 'iPhone 15', category: 'Smartphones' },
-      { name: 'MacBook Pro', category: 'Laptops' },
-      { name: 'Coca Cola', category: 'Flavoured Drinks' },
-      { name: 'Espresso', category: 'Coffee' },
-      { name: 'Cotton T-Shirt', category: 'T-Shirts' },
-      { name: 'Denim Jeans', category: 'Jeans' },
+      { name: "iPhone 15", category: "Smartphones" },
+      { name: "MacBook Pro", category: "Laptops" },
+      { name: "Coca Cola", category: "Flavoured Drinks" },
+      { name: "Espresso", category: "Coffee" },
+      { name: "Cotton T-Shirt", category: "T-Shirts" },
+      { name: "Denim Jeans", category: "Jeans" },
     ];
 
     for (const product of products) {
       await pool.query(
-        'INSERT INTO products (name, category_id) VALUES ($1, $2)',
+        "INSERT INTO products (name, category_id) VALUES ($1, $2)",
         [product.name, categoryIds[product.category]]
       );
     }
 
-    console.log('Database seeded successfully');
+    console.log("Database seeded successfully");
   } catch (error) {
-    console.error('Error seeding database:', error);
+    console.error("Error seeding database:", error);
     throw error;
   }
 };
 
 // Graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('Closing database connection...');
+process.on("SIGINT", async () => {
+  console.log("Closing database connection...");
   await pool.end();
   process.exit(0);
 });
 
-process.on('SIGTERM', async () => {
-  console.log('Closing database connection...');
+process.on("SIGTERM", async () => {
+  console.log("Closing database connection...");
   await pool.end();
   process.exit(0);
 });
