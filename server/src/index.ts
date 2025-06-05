@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import { initializeDatabase, seedDatabase } from "./database/init";
+import { initializeDatabase, seedDatabase } from "./database/postgres";
 import attributesRouter from "./routes/attributes";
 import categoriesRouter from "./routes/categories";
 
@@ -39,20 +39,13 @@ app.get("/api/health", (req, res) => {
 });
 
 // Error handling middlewar
-app.use(
-  (
-    err: Error,
-    req: express.Request,
-    res: express.Response,
-    _next: express.NextFunction
-  ) => {
-    console.error("Error:", err);
-    res.status(500).json({
-      error: "Internal server error",
-      message: process.env.NODE_ENV === "development" ? err.message : undefined,
-    });
-  }
-);
+app.use((err: Error, req: express.Request, res: express.Response) => {
+  console.error("Error:", err);
+  res.status(500).json({
+    error: "Internal server error",
+    message: process.env.NODE_ENV === "development" ? err.message : undefined,
+  });
+});
 
 // 404 handler
 app.use((req, res) => {
@@ -60,14 +53,14 @@ app.use((req, res) => {
 });
 
 // Initialize database and start server
-const startServer = () => {
+const startServer = async () => {
   try {
     console.log("Initializing database...");
-    initializeDatabase();
+    await initializeDatabase();
     console.log("Database initialized successfully");
 
     console.log("Seeding database...");
-    seedDatabase();
+    await seedDatabase();
     console.log("Database seeded successfully");
 
     app.listen(PORT, () => {
