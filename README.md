@@ -1,54 +1,150 @@
-# React + TypeScript + Vite
+# Trustana API Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack e-commerce catalog management application built with React, TypeScript, Express, and PostgreSQL. This project demonstrates a product categorization system with dynamic attributes, allowing for hierarchical category management and product organization.
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend**: React 19, TypeScript, Vite, TailwindCSS, React Query
+- **Backend**: Express, Node.js, TypeScript
+- **Database**: PostgreSQL 15
+- **Containerization**: Docker, Docker Compose
+- **Development**: Nodemon, ESLint, Concurrently
 
-## Expanding the ESLint configuration
+## 📋 Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Before you begin, ensure you have the following installed:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- [Node.js](https://nodejs.org/) (LTS version recommended)
+- [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+- [Docker](https://www.docker.com/) and Docker Compose
+
+## 🛠️ Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/trustana-api.git
+   cd trustana-api
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or using pnpm
+   pnpm install
+   ```
+
+## 🏃‍♂️ Running the Application
+
+### Development Mode
+
+You can start the application in development mode with a single command:
+
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+This command will:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Start the PostgreSQL database container
+2. Initialize the database with the schema defined in `init.sql`
+3. Start the Express server (backend) on port 3001
+4. Start the Vite development server (frontend) on port 5173
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### Alternative Start Options
+
+Start with full Docker setup (database & seeding):
+
+```bash
+npm run dev:full
+```
+
+Start only the database:
+
+```bash
+npm run db:start
+```
+
+Start only the backend server:
+
+```bash
+npm run server:dev
+```
+
+Start only the frontend:
+
+```bash
+npm run client:dev
+```
+
+## 🔄 Database Management
+
+Reset the database (removes all data and recreates the containers):
+
+```bash
+npm run db:reset
+```
+
+Stop the database:
+
+```bash
+npm run db:stop
+```
+
+Remove all containers and volumes:
+
+```bash
+npm run db:down
+```
+
+View database logs:
+
+```bash
+npm run db:logs
+```
+
+## 🔧 Configuration
+
+The application uses environment variables for configuration. You can create a `.env` file in the root directory with the following variables:
+
+```
+PORT=3001
+CLIENT_URL=http://localhost:5173
+```
+
+## 📦 Building for Production
+
+Build the application for production:
+
+```bash
+npm run build
+```
+
+This will compile the TypeScript files and bundle the frontend application.
+
+## 📝 API Endpoints
+
+The API provides the following main endpoints:
+
+- `/api/attributes` - Manage product attributes
+- `/api/categories` - Manage product categories
+- `/api/products` - Manage products
+
+## 📚 Project Structure
+
+```
+trustana-api/
+├── server/                # Backend code
+│   └── src/
+│       ├── controllers/   # Route controllers
+│       ├── database/      # Database connection and utilities
+│       ├── models/        # Data models
+│       └── routes/        # API routes
+├── src/                   # Frontend code
+│   ├── components/        # React components
+│   ├── lib/               # Utilities and API client
+│   └── assets/            # Static assets
+├── docker-compose.yml     # Docker configuration
+├── init.sql               # Database initialization
+└── package.json           # Project dependencies and scripts
 ```
